@@ -1,11 +1,50 @@
-# 1. Initialize git and stage all files
-git init
-git add .
-git commit -m "Deploy Romantic Sanctuary to Good0211V2.github.io"
+name: Deploy to GitHub Pages
 
-# 2. Point to your Good0211V2.github.io repository
-git branch -M main
-git remote add origin https://github.com/Good0211V2/Good0211V2.github.io.git
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
-# 3. Push and trigger deployment
-git push -u origin main --force
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
