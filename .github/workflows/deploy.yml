@@ -1,1 +1,11 @@
+# 1. Initialize git and stage all files
+git init
+git add .
+git commit -m "Deploy Romantic Sanctuary to Good0211V2.github.io"
 
+# 2. Point to your Good0211V2.github.io repository
+git branch -M main
+git remote add origin https://github.com/Good0211V2/Good0211V2.github.io.git
+
+# 3. Push and trigger deployment
+git push -u origin main --force
